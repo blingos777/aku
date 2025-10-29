@@ -1,11 +1,7 @@
 module.exports = {
     bot: {
         tokens: [
-          "MTQwMzA1ODcwNDc4MTQxMDMzNg.G6yttw.3TiGArkaVKNd52pETBNi0rE-K3BwG3_3yZZYak",              // Main bot token - Replace with your actual token
-        //  "YOUR_SECOND_BOT_TOKEN_HERE",      // 2 bot token - Uncomment and replace to use
-        //  "YOUR_THIRD_BOT_TOKEN_HERE",       // 3 bot token - Uncomment and replace to use
-        //  "YOUR_FOURTH_BOT_TOKEN_HERE",      // 4 bot token - Uncomment and replace to use
-        //  "YOUR_FIFTH_BOT_TOKEN_HERE",       // 5 bot token - Uncomment and replace to use
+          process.env.DISCORD_TOKEN, // 👈 يقرأ من البيئة في Render
         ].filter(Boolean),
 
         defaultLanguage: 'ar', // ar | en لغة البوت
@@ -36,3 +32,4 @@ module.exports = {
     }
 
 };
+

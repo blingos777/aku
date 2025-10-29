@@ -1,4 +1,4 @@
-const { Client, Intents } = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 const config = require('./config');
 const { createLogger, drawBanner } = require('./src/utils/helpers');
 const languageManager = require('./src/models/LanguageManager');
@@ -26,16 +26,16 @@ const initializeClients = async () => {
             continue;
         }
 
-        const client = new Client({
-            intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_MESSAGES,
-                Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_PRESENCES,
-                Intents.FLAGS.DIRECT_MESSAGES
-            ],
-            partials: ['CHANNEL']
-        });
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.DirectMessages
+    ],
+    partials: ['CHANNEL']
+});
         
         setupEventListeners(client);
         

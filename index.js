@@ -184,19 +184,5 @@ process.on('unhandledRejection', (reason, promise) => {
     } catch (error) {
         logger.error('Failed to initialize application:', error);
         process.exit(1);
-    }
-    // ======== Keep Alive Server ========
-const express = require('express');
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send('✅ Bot is alive and running!');
-});
-
-// Render تعطيك المنفذ من متغير بيئة اسمه PORT
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`[KeepAlive] Server running on port ${PORT}`);
-           
+    }          
 })();

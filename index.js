@@ -26,15 +26,16 @@ const initializeClients = async () => {
             continue;
         }
 
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.DirectMessages
+        GatewayIntentBits.MessageContent  // <--- مهم جداً للرسائل النصية
     ],
-    partials: ['CHANNEL']
+    partials: [Partials.Channel, Partials.Message, Partials.User]
 });
         
         setupEventListeners(client);

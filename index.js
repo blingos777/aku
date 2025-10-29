@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, Partials } = require('discord.js');
 const config = require('./config');
 const { createLogger, drawBanner } = require('./src/utils/helpers');
 const languageManager = require('./src/models/LanguageManager');
@@ -33,7 +33,7 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.MessageContent  // <--- مهم جداً للرسائل النصية
+        GatewayIntentBits.MessageContent   // مهم لقراءة محتوى الرسائل
     ],
     partials: [Partials.Channel, Partials.Message, Partials.User]
 });

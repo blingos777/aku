@@ -174,7 +174,6 @@ process.on('unhandledRejection', (reason, promise) => {
  ╚══╝╚══╝ ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝ 
                                          Made by Wick Studio
                                        https://discord.gg/wicks
-
 🚀 ${languageManager.translate('system.appTitle')} v2.0
 🤖 ${languageManager.translate('system.activeClients')}: ${clients.length}
 ⚡ ${languageManager.translate('system.broadcastCapacity')}: ~${config.broadcast.requestsPerSecond * clients.length} ${languageManager.translate('system.membersPerSecond')}
@@ -186,3 +185,16 @@ process.on('unhandledRejection', (reason, promise) => {
         process.exit(1);
     }          
 })();
+
+// ======== Keep Alive Server ========
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('✅ Bot is alive and running!');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`[KeepAlive] Server running on port ${PORT}`);
+});

@@ -33,10 +33,11 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.MessageContent   // مهم لقراءة محتوى الرسائل
+        GatewayIntentBits.MessageContent
     ],
     partials: [Partials.Channel, Partials.Message, Partials.User]
 });
+
         
         setupEventListeners(client);
         

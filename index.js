@@ -1,4 +1,5 @@
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, Intents } = require('discord.js');
+const express = require('express'); // ✅ لإبقاء البوت شغال 24 ساعة
 const config = require('./config');
 const { createLogger, drawBanner } = require('./src/utils/helpers');
 const languageManager = require('./src/models/LanguageManager');
@@ -26,18 +27,16 @@ const initializeClients = async () => {
             continue;
         }
 
-
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.MessageContent
-    ],
-    partials: [Partials.Channel, Partials.Message, Partials.User]
-});
-
+        const client = new Client({
+            intents: [
+                Intents.FLAGS.GUILDS,
+                Intents.FLAGS.GUILD_MESSAGES,
+                Intents.FLAGS.GUILD_MEMBERS,
+                Intents.FLAGS.GUILD_PRESENCES,
+                Intents.FLAGS.DIRECT_MESSAGES
+            ],
+            partials: ['CHANNEL']
+        });
         
         setupEventListeners(client);
         
@@ -83,7 +82,6 @@ const setupEventListeners = (client) => {
     
     client.on('messageCreate', async (message) => {
         if (clients.length > 0 && client !== clients[0]) return;
-        
         if (message.author.bot) return;
 
         if (message.content === '-wick') {
@@ -122,10 +120,8 @@ const setupEventListeners = (client) => {
             const langCode = message.content.split(' ')[1]?.toLowerCase();
             if (langCode && languageManager.getAllLanguages()[langCode]) {
                 languageManager.setDefaultLanguage(langCode);
-                
                 message.reply(languageManager.translate('system.languageUpdated', 
                     languageManager.getLanguage().language.native));
-                
                 logger.info(`Language changed to ${langCode} by ${message.author.tag}`);
             } else {
                 message.reply(languageManager.translate('system.invalidLanguage'));
@@ -176,6 +172,7 @@ process.on('unhandledRejection', (reason, promise) => {
  ╚══╝╚══╝ ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝ 
                                          Made by Wick Studio
                                        https://discord.gg/wicks
+
 🚀 ${languageManager.translate('system.appTitle')} v2.0
 🤖 ${languageManager.translate('system.activeClients')}: ${clients.length}
 ⚡ ${languageManager.translate('system.broadcastCapacity')}: ~${config.broadcast.requestsPerSecond * clients.length} ${languageManager.translate('system.membersPerSecond')}
@@ -185,18 +182,11 @@ process.on('unhandledRejection', (reason, promise) => {
     } catch (error) {
         logger.error('Failed to initialize application:', error);
         process.exit(1);
-    }          
+    }
 })();
 
-// ======== Keep Alive Server ========
-const express = require('express');
+/* ✅ كود التشغيل 24 ساعة */
 const app = express();
-
-app.get('/', (req, res) => {
-  res.send('✅ Bot is alive and running!');
-});
-
+app.get('/', (req, res) => res.send('Wick Broadcast Bot is alive!'));
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`[KeepAlive] Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🌐 KeepAlive server running on port ${PORT}`));

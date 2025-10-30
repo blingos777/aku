@@ -26,17 +26,14 @@ const initializeClients = async () => {
             continue;
         }
 
-const { Client, GatewayIntentBits } = require('discord.js');
-
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,           // كان Intents.FLAGS.GUILDS
-    GatewayIntentBits.GuildMessages,    // كان Intents.FLAGS.GUILD_MESSAGES
-    GatewayIntentBits.GuildMembers,     // كان Intents.FLAGS.GUILD_MEMBERS
-    GatewayIntentBits.GuildPresences,   // كان Intents.FLAGS.GUILD_PRESENCES
-    GatewayIntentBits.DirectMessages,   // كان Intents.FLAGS.DIRECT_MESSAGES
-    GatewayIntentBits.MessageContent    // أضف هذا لو البوت يحتاج يقرأ محتوى الرسائل
-  ],
+        const client = new Client({
+            intents: [
+                Intents.FLAGS.GUILDS,
+                Intents.FLAGS.GUILD_MESSAGES,
+                Intents.FLAGS.GUILD_MEMBERS,
+                Intents.FLAGS.GUILD_PRESENCES,
+                Intents.FLAGS.DIRECT_MESSAGES
+            ],
             partials: ['CHANNEL']
         });
         

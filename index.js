@@ -1,5 +1,6 @@
-const { Client, Intents } = require('discord.js');
-const express = require('express'); // ✅ لإبقاء البوت شغال 24 ساعة
+// ✅ استيراد المكتبات
+const express = require('express');
+const { Client, GatewayIntentBits, Partials } = require('discord.js');
 const config = require('./config');
 const { createLogger, drawBanner } = require('./src/utils/helpers');
 const languageManager = require('./src/models/LanguageManager');
@@ -8,9 +9,16 @@ const broadcastController = require('./src/controllers/BroadcastController');
 
 const logger = createLogger('Main');
 
+// 🌐 كود التشغيل الدائم (KeepAlive)
+const app = express();
+app.get('/', (req, res) => res.send('🌐 Bot is running 24/7!'));
+app.listen(10000, () => console.log('🌐 KeepAlive server running on port 10000'));
+
+// إعداد اللغة الافتراضية
 languageManager.setDefaultLanguage(config.bot.defaultLanguage);
 
 const clients = [];
+
 const initializeClients = async () => {
     logger.info('Initializing broadcast clients...');
     
@@ -20,26 +28,27 @@ const initializeClients = async () => {
     }
     
     let successfulLogins = 0;
-    
+
     for (const token of config.bot.tokens) {
         if (!token) {
             logger.warn('Empty token found in configuration, skipping');
             continue;
         }
 
+        // ✅ التعديل المهم: intents و partials بنظام v14
         const client = new Client({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_MESSAGES,
-                Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_PRESENCES,
-                Intents.FLAGS.DIRECT_MESSAGES
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildPresences,
+                GatewayIntentBits.DirectMessages
             ],
-            partials: ['CHANNEL']
+            partials: [Partials.Channel]
         });
-        
+
         setupEventListeners(client);
-        
+
         try {
             await client.login(token);
             clients.push(client);
@@ -49,7 +58,7 @@ const initializeClients = async () => {
             logger.error(`Failed to login with token: ${token.substring(0, 8)}... Error: ${error.message}`);
         }
     }
-    
+
     if (clients.length > 0) {
         await broadcastManager.initialize(clients);
         logger.info(`Successfully initialized ${clients.length} clients for broadcasting`);
@@ -64,22 +73,22 @@ const setupEventListeners = (client) => {
         logger.info(`Client ready: ${client.user.tag}`);
     
         client.user.setPresence({
-            activities: [{ 
-                name: config.bot.activity.name, 
-                type: config.bot.activity.type 
+            activities: [{
+                name: config.bot.activity.name,
+                type: config.bot.activity.type
             }],
             status: config.bot.activity.status,
         });
     });
-    
+
     client.on('error', (error) => {
         logger.error(`Client error: ${client.user?.tag || 'Unknown'}`, error);
     });
-    
+
     client.on('warn', (warning) => {
         logger.warn(`Client warning: ${client.user?.tag || 'Unknown'}`, warning);
     });
-    
+
     client.on('messageCreate', async (message) => {
         if (clients.length > 0 && client !== clients[0]) return;
         if (message.author.bot) return;
@@ -94,12 +103,12 @@ const setupEventListeners = (client) => {
                 await message.guild.members.fetch();
                 const members = message.guild.members.cache.filter(member => !member.user.bot);
                 logger.info(`Test Command: Fetched ${members.size} members.`);
-                
+
                 const totalBots = clients.length;
                 const estimatedSpeed = config.broadcast.requestsPerSecond * totalBots;
                 const estimatedTime = Math.ceil(members.size / estimatedSpeed);
-                
-                message.reply(languageManager.translate('messages.testResults', 
+
+                message.reply(languageManager.translate('messages.testResults',
                     members.size,
                     totalBots,
                     estimatedSpeed,
@@ -120,7 +129,7 @@ const setupEventListeners = (client) => {
             const langCode = message.content.split(' ')[1]?.toLowerCase();
             if (langCode && languageManager.getAllLanguages()[langCode]) {
                 languageManager.setDefaultLanguage(langCode);
-                message.reply(languageManager.translate('system.languageUpdated', 
+                message.reply(languageManager.translate('system.languageUpdated',
                     languageManager.getLanguage().language.native));
                 logger.info(`Language changed to ${langCode} by ${message.author.tag}`);
             } else {
@@ -128,16 +137,16 @@ const setupEventListeners = (client) => {
             }
             return;
         }
-        
+
         if (message.content.startsWith('-bc ')) {
             await broadcastController.handleCommand(message);
             return;
         }
     });
-    
+
     client.on('interactionCreate', async (interaction) => {
         if (clients.length > 0 && client !== clients[0]) return;
-        
+
         if (interaction.isButton()) {
             await broadcastController.handleButtonInteraction(interaction);
             return;
@@ -178,15 +187,8 @@ process.on('unhandledRejection', (reason, promise) => {
 ⚡ ${languageManager.translate('system.broadcastCapacity')}: ~${config.broadcast.requestsPerSecond * clients.length} ${languageManager.translate('system.membersPerSecond')}
 📨 ${languageManager.translate('system.commands')}: -bc, -language, -wick
 `);
-        
     } catch (error) {
         logger.error('Failed to initialize application:', error);
         process.exit(1);
     }
 })();
-
-/* ✅ كود التشغيل 24 ساعة */
-const app = express();
-app.get('/', (req, res) => res.send('Wick Broadcast Bot is alive!'));
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🌐 KeepAlive server running on port ${PORT}`));

@@ -12,5 +12,6 @@
   "description": "Advanced Discord broadcast system with multi-client support",
   "dependencies": {
     "discord.js": "^13.12.0"
+    "winston": "^3.10.0"
   }
 }

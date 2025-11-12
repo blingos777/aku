@@ -1,26 +1,39 @@
 // ==========================================================
-// 🌀 Auto-Restart Wrapper (للتشغيل 24/7 على Render)
+// ⚙️ Auto Setup & Restart Wrapper — for 24/7 uptime on Render
 // ==========================================================
-if (process.env.RESTART_LOOP !== '1') {
-    const { spawn } = require('child_process');
+(async () => {
+  const { execSync, spawn } = require("child_process");
+  const fs = require("fs");
 
+  // ✅ 1. تأكد أن الحزم موجودة
+  const requiredPackages = ["discord.js", "winston"];
+  const missing = requiredPackages.filter(p => {
+    try { require.resolve(p); return false; } catch { return true; }
+  });
+  if (missing.length) {
+    console.log("📦 Installing missing dependencies:", missing.join(", "));
+    execSync(`npm install ${missing.join(" ")} --force`, { stdio: "inherit" });
+  }
+
+  // ✅ 2. تأكد أن هذا هو الـ process الأساسي فقط
+  if (process.env.RESTART_LOOP !== "1") {
     const restart = () => {
-        const subprocess = spawn(process.argv[0], process.argv.slice(1), {
-            env: { ...process.env, RESTART_LOOP: '1' },
-            stdio: 'inherit'
-        });
-
-        subprocess.on('exit', (code) => {
-            console.log(`❌ Bot exited with code ${code}. Restarting in 5s...`);
-            setTimeout(restart, 5000);
-        });
+      const subprocess = spawn(process.argv[0], process.argv.slice(1), {
+        env: { ...process.env, RESTART_LOOP: "1" },
+        stdio: "inherit"
+      });
+      subprocess.on("exit", (code) => {
+        console.log(`❌ Bot exited with code ${code}. Restarting in 5s...`);
+        setTimeout(restart, 5000);
+      });
     };
-
     restart();
     return;
-}
+  }
+})();
+
 // ==========================================================
-// 🔹 الكود الأصلي أدناه بدون أي تعديل
+// 🔹 الكود الأصلي بالكامل (بدون أي تعديل في الوظائف)
 // ==========================================================
 
 const { Client, Intents } = require('discord.js');

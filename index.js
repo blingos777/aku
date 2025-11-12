@@ -1,3 +1,28 @@
+// ==========================================================
+// 🌀 Auto-Restart Wrapper (للتشغيل 24/7 على Render)
+// ==========================================================
+if (process.env.RESTART_LOOP !== '1') {
+    const { spawn } = require('child_process');
+
+    const restart = () => {
+        const subprocess = spawn(process.argv[0], process.argv.slice(1), {
+            env: { ...process.env, RESTART_LOOP: '1' },
+            stdio: 'inherit'
+        });
+
+        subprocess.on('exit', (code) => {
+            console.log(`❌ Bot exited with code ${code}. Restarting in 5s...`);
+            setTimeout(restart, 5000);
+        });
+    };
+
+    restart();
+    return;
+}
+// ==========================================================
+// 🔹 الكود الأصلي أدناه بدون أي تعديل
+// ==========================================================
+
 const { Client, Intents } = require('discord.js');
 const config = require('./config');
 const { createLogger, drawBanner } = require('./src/utils/helpers');
